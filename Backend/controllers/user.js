@@ -1,19 +1,19 @@
-const User = require('../models/user.js');
 const Users = require('../models/user.js');
-
+const bcrypt = require('bcrypt');
 const getAllUsers = async (req,res)=>{
     const users = await Users.find({});
     res.json(users)
 }
 const createNewUser = async (req,res)=>{
-    
-    const user = new Users(req.body); 
-    try{
+    const {username,password,email} = req.body;
+    try{ 
+        const user = new Users({username,password,email});
+        user.password = await bcrypt.hash(password,10);
         await user.save()
-        res.json({success: true})
+        res.json({success: true,message:'User registered Successfully'})
     }
-    catch{
-        res.json({error: "error"})
+    catch(e){
+        res.json({error: e.message})
     }
 }
 
@@ -28,7 +28,7 @@ const updateUser = async (req, res) => {
         if (!updatedUser) {
             return res.status(404).json({ message: 'User not found' });
         }
-        res.json({success:true});
+        res.json({success:true,message:'user updated successfully'});
     } 
     catch (error) {
         res.status(500).json({ message: 'Error updating user', error });
@@ -57,7 +57,7 @@ const deleteUser = async (req, res) => {
 
 const getUser = async (req,res)=>{
     const id = req.params.id;
-    const user = await User.findById(id) 
+    const user = await Users.findById(id) 
     res.json(user)
 }
 
