@@ -10,6 +10,8 @@ const createNewUser = async (req,res)=>{
         const user = new Users({username,password,email});
         user.password = await bcrypt.hash(password,10);
         await user.save()
+        
+        
         res.json({success: true,message:'User registered Successfully'})
     }
     catch(e){
